@@ -45,8 +45,8 @@ def separateRatingBlurbFromList(listOfReviews):
 
 def main():
     listOfReviews = getIndividualLinesAsList("smallReviews.txt")
-    reviews = separateRatingBlurbFromList(listOfReviews)
-    print(reviews)
+    reviewsAndBlurbs = separateRatingBlurbFromList(listOfReviews)
+    print(reviewsAndBlurbs)
 
 
 main()
