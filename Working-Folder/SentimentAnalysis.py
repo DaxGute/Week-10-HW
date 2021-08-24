@@ -69,14 +69,23 @@ def getUniqueWordsRating(uniqueWords, reviewsAndBlurbs):
 
     return wordRatings
 
+def displayScores(uniqueWordsRatings):
+    uniqueWordsRatings = sorted(uniqueWordsRatings.items(), key=lambda x:x[1], reverse=True) #yucky but efficient lambdas
+    for item in uniqueWordsRatings:
+        print(str(item[1]) + " " + item[0])
+    # orderedWordsAndRatings = []]
+    #
+    # for key, rating in uniqueWordsRatings:
+    #     orderedWordsAndRatings.append((key,rating))
+    # orderedWords.sort()
+
 
 def main():
     listOfReviews = getIndividualLinesAsList("smallReviews.txt")
     reviewsAndBlurbs = separateRatingBlurbFromList(listOfReviews)
     reviewsAndBlurbs['ratings'] = adjustRatings(reviewsAndBlurbs['ratings'])
     uniqueWords = getUniqueWords(reviewsAndBlurbs['blurb'])
-    uniqueWordsRating = getUniqueWordsRating(uniqueWords, reviewsAndBlurbs)
+    uniqueWordsRatings = getUniqueWordsRating(uniqueWords, reviewsAndBlurbs)
     displayScores(uniqueWordsRatings)
-    print(uniqueWordsRating)
 
 main()
