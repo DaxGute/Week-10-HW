@@ -2,7 +2,7 @@ def getIndividualLinesAsList(file):
     f = open(file, "r")
     listOfLines = []
     for x in f:
-        listOfLines.append(''.join(filter(str.isalnum, x)) )
+        listOfLines.append(x.lower().replace("\n","").replace("\t",""))
 
     return listOfLines
 
@@ -25,18 +25,17 @@ def purgeUnecessaryCharacters(reviewBlurbs):
         for word in words:
             if word not in bannedWords:
                 newReview.append(word)
-                print(bannedWords)
         newTrimmedReviews.append(newReview)
 
     return newTrimmedReviews
 
 
-def getReviewRatingFromList(listOfReviews):
+def separateRatingBlurbFromList(listOfReviews):
     reviews = {}
     reviews["ratings"] = []
     reviews["blurb"] = []
     for review in listOfReviews:
-        reviews["ratings"].append(review[:1])
+        reviews["ratings"].append(int(review[:1]))
         reviews["blurb"].append(review[1:])
 
     reviews["blurb"] = purgeUnecessaryCharacters(reviews["blurb"])
@@ -46,7 +45,7 @@ def getReviewRatingFromList(listOfReviews):
 
 def main():
     listOfReviews = getIndividualLinesAsList("smallReviews.txt")
-    reviews = getReviewRatingFromList(listOfReviews)
+    reviews = separateRatingBlurbFromList(listOfReviews)
     print(reviews)
 
 
