@@ -81,7 +81,7 @@ def displayScores(uniqueWordsRatings):
 
 
 def main():
-    listOfReviews = getIndividualLinesAsList("smallReviews.txt")
+    listOfReviews = getIndividualLinesAsList("movieReviews.txt")
     reviewsAndBlurbs = separateRatingBlurbFromList(listOfReviews)
     reviewsAndBlurbs['ratings'] = adjustRatings(reviewsAndBlurbs['ratings'])
     uniqueWords = getUniqueWords(reviewsAndBlurbs['blurb'])
