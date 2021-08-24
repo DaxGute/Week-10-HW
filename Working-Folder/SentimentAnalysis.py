@@ -58,11 +58,25 @@ def getUniqueWords(blurbs):
 
     return allWordList
 
+def getUniqueWordsRating(uniqueWords, reviewsAndBlurbs):
+    wordRatings = {}
+    for word in uniqueWords:
+        wordRatings[word] = 0
+
+    for i in range(len(reviewsAndBlurbs['ratings'])):
+        for word in reviewsAndBlurbs['blurb'][i]:
+            wordRatings[word] += reviewsAndBlurbs['ratings'][i]
+
+    return wordRatings
+
+
 def main():
     listOfReviews = getIndividualLinesAsList("smallReviews.txt")
     reviewsAndBlurbs = separateRatingBlurbFromList(listOfReviews)
     reviewsAndBlurbs['ratings'] = adjustRatings(reviewsAndBlurbs['ratings'])
     uniqueWords = getUniqueWords(reviewsAndBlurbs['blurb'])
-    print(uniqueWords)
+    uniqueWordsRating = getUniqueWordsRating(uniqueWords, reviewsAndBlurbs)
+    displayScores(uniqueWordsRatings)
+    print(uniqueWordsRating)
 
 main()
