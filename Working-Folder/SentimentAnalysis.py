@@ -35,18 +35,34 @@ def separateRatingBlurbFromList(listOfReviews):
     reviews["ratings"] = []
     reviews["blurb"] = []
     for review in listOfReviews:
-        reviews["ratings"].append(int(review[:1]))
+        reviews["ratings"].append(review[:1])
         reviews["blurb"].append(review[1:])
 
     reviews["blurb"] = purgeUnecessaryCharacters(reviews["blurb"])
 
     return reviews
 
+def adjustRatings(ratings):
+    allRatings = []
+    for rating in ratings:
+        allRatings.append(int(rating) - 2)
+
+    return allRatings
+
+def getUniqueWords(blurbs):
+    allWordList = []
+    for rating in blurbs:
+        for word in rating:
+            if not word in allWordList:
+                allWordList.append(word)
+
+    return allWordList
 
 def main():
     listOfReviews = getIndividualLinesAsList("smallReviews.txt")
     reviewsAndBlurbs = separateRatingBlurbFromList(listOfReviews)
-    print(reviewsAndBlurbs)
-
+    reviewsAndBlurbs['ratings'] = adjustRatings(reviewsAndBlurbs['ratings'])
+    uniqueWords = getUniqueWords(reviewsAndBlurbs['blurb'])
+    print(uniqueWords)
 
 main()
