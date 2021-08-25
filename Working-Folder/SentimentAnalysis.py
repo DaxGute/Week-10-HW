@@ -107,6 +107,7 @@ def displayScores(uniqueWordsRatings):
         print(f'{uniqueWordsRatings[i][1]:.2f} {uniqueWordsRatings[i][0]}')
 
 
+#TODO: make sure to filter out all of the bad apostrophes and stuff
 def main():
     listOfReviews = getIndividualLinesAsList("movieReviews.txt")
     reviewsAndBlurbs = separateRatingBlurbFromList(listOfReviews)
