@@ -1,3 +1,4 @@
+import math
 """
 Purpose: This code is passed in a file name and searches the immediate folder
 for that file. When this file is found, it parses in its data line by line.
@@ -72,12 +73,20 @@ associated scores.
 """
 def getUniqueWordsRating(reviewsAndBlurbs):
     wordRatings = {}
+    wordSum = {}
+    wordNum = {}
     for i in range(len(reviewsAndBlurbs['ratings'])):
         for word in reviewsAndBlurbs['blurb'][i]:
             try:
-                wordRatings[word] += reviewsAndBlurbs['ratings'][i]
+                wordSum[word] += reviewsAndBlurbs['ratings'][i]
             except:
-                wordRatings[word] = 0 # creates a key if there isn't already one
+                wordSum[word] = reviewsAndBlurbs['ratings'][i] # creates a key if there isn't already one
+            try:
+                wordNum[word] += 1
+            except:
+                wordNum[word] = 1
+    for word in wordSum:
+        wordRatings[word] = (wordSum[word]/wordNum[word])*math.log(wordNum[word])
 
     return wordRatings
 
@@ -85,17 +94,17 @@ def getUniqueWordsRating(reviewsAndBlurbs):
 """
 Purpose: This function receives a dictionary of words and their associated ratings.
 Using the built in sort method, the function sorts the dictionary by the the value
-that is associated with the word. Words with the highest values are sent to the top
-and then displayed via a print statement.
+that is associated with the word. Words with the highest values are sent to the top.
+Words are then displayed by the top twenty and bottom twenty.
 """
 def displayScores(uniqueWordsRatings):
     uniqueWordsRatings = sorted(uniqueWordsRatings.items(), key=lambda x:x[1], reverse=True) #yucky but efficient lambdas
     print("Top 20")
     for i in range(21):
-        print(f'{str(uniqueWordsRatings[i][1]):4} {uniqueWordsRatings[i][0]}')
+        print(f'{uniqueWordsRatings[i][1]:.2f} {uniqueWordsRatings[i][0]}')
     print("\nBottom 20")
     for i in range(-20, 0):
-        print(f'{str(uniqueWordsRatings[i][1]):4} {uniqueWordsRatings[i][0]}')
+        print(f'{uniqueWordsRatings[i][1]:.2f} {uniqueWordsRatings[i][0]}')
 
 
 def main():
