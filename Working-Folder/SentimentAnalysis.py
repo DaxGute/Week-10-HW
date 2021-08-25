@@ -1,3 +1,8 @@
+"""
+Purpose: This code is passed in a file name and searches the immediate folder
+for that file. When this file is found, it parses in its data line by line.
+Each one of these lines are stored in an array for later use and passed out.
+"""
 def getIndividualLinesAsList(file):
     f = open(file, "r")
     listOfLines = []
@@ -6,86 +11,97 @@ def getIndividualLinesAsList(file):
 
     return listOfLines
 
-def getWords(review):
-    words = []
-    lastSpaceIndex = 0
-    for i in range(len(review)):
-        if review[i] == " ":
-            words.append(review[lastSpaceIndex:i])
-            lastSpaceIndex = i + 1
-
-    return words
-
+"""
+Purpose: This method eliminates all the words that are unlikely to provide clarity
+on whether or not a given film is good or bad based on the ratings. These words
+are stored in a file that is read in. If any of the words in a line match these
+banned words, they are removed. The words are kept as individual indexs on an
+array of blurbs and then returned.
+"""
 def purgeUnecessaryCharacters(reviewBlurbs):
     bannedWords = getIndividualLinesAsList("stopWords.txt")
     newTrimmedReviews = []
     for review in reviewBlurbs:
-        words = getWords(review)
-        newReview = []
+        words = getWordsOfBlurb(review)
+        newBlurb = []
         for word in words:
             if word not in bannedWords:
-                newReview.append(word)
-        newTrimmedReviews.append(newReview)
+                newBlurb.append(word)
+        newTrimmedReviews.append(newBlurb)
 
     return newTrimmedReviews
 
+"""
+Purpose: This method is passed in a blurb of the of a review. Using this blurb,
+it then splits up the blurb into the words and puts those split up words into an
+array that is passed out.
+"""
+def getWordsOfBlurb(blurbText):
+    words = []
+    lastSpaceIndex = 0
+    for i in range(len(blurbText)):
+        if blurbText[i] == " ":
+            words.append(blurbText[lastSpaceIndex:i])
+            lastSpaceIndex = i + 1
 
+    return words
+
+
+"""
+Purpose: This method separates the Blurbs and the Ratings from the list. The ratings
+are appropriately shifted and then both of them are returned as items of a dictionary.
+"""
 def separateRatingBlurbFromList(listOfReviews):
     reviews = {}
     reviews["ratings"] = []
     reviews["blurb"] = []
     for review in listOfReviews:
-        reviews["ratings"].append(review[:1])
+        reviews["ratings"].append(int(review[:1])-2)
         reviews["blurb"].append(review[1:])
 
     reviews["blurb"] = purgeUnecessaryCharacters(reviews["blurb"])
 
     return reviews
 
-def adjustRatings(ratings):
-    allRatings = []
-    for rating in ratings:
-        allRatings.append(int(rating) - 2)
 
-    return allRatings
-
-def getUniqueWords(blurbs):
-    allWordList = []
-    for rating in blurbs:
-        for word in rating:
-            if not word in allWordList:
-                allWordList.append(word)
-
-    return allWordList
-
-def getUniqueWordsRating(uniqueWords, reviewsAndBlurbs):
+"""
+Purpose: This function tallys up the scores of all of the words. Words that appear
+more in more highly rated movies will correspondingly receive higher scores. It
+then outputs this list of scores as an unsorted dictionary of words and their
+associated scores.
+"""
+def getUniqueWordsRating(reviewsAndBlurbs):
     wordRatings = {}
-    for word in uniqueWords:
-        wordRatings[word] = 0
-
     for i in range(len(reviewsAndBlurbs['ratings'])):
         for word in reviewsAndBlurbs['blurb'][i]:
-            wordRatings[word] += reviewsAndBlurbs['ratings'][i]
+            try:
+                wordRatings[word] += reviewsAndBlurbs['ratings'][i]
+            except:
+                wordRatings[word] = 0 # creates a key if there isn't already one
 
     return wordRatings
 
+
+"""
+Purpose: This function receives a dictionary of words and their associated ratings.
+Using the built in sort method, the function sorts the dictionary by the the value
+that is associated with the word. Words with the highest values are sent to the top
+and then displayed via a print statement.
+"""
 def displayScores(uniqueWordsRatings):
     uniqueWordsRatings = sorted(uniqueWordsRatings.items(), key=lambda x:x[1], reverse=True) #yucky but efficient lambdas
-    for item in uniqueWordsRatings:
-        print(str(item[1]) + " " + item[0])
-    # orderedWordsAndRatings = []]
-    #
-    # for key, rating in uniqueWordsRatings:
-    #     orderedWordsAndRatings.append((key,rating))
-    # orderedWords.sort()
+    print("Top 20")
+    for i in range(21):
+        print(f'{str(uniqueWordsRatings[i][1]):4} {uniqueWordsRatings[i][0]}')
+    print("\nBottom 20")
+    for i in range(-20, 0):
+        print(f'{str(uniqueWordsRatings[i][1]):4} {uniqueWordsRatings[i][0]}')
 
 
 def main():
     listOfReviews = getIndividualLinesAsList("movieReviews.txt")
     reviewsAndBlurbs = separateRatingBlurbFromList(listOfReviews)
-    reviewsAndBlurbs['ratings'] = adjustRatings(reviewsAndBlurbs['ratings'])
-    uniqueWords = getUniqueWords(reviewsAndBlurbs['blurb'])
-    uniqueWordsRatings = getUniqueWordsRating(uniqueWords, reviewsAndBlurbs)
+    uniqueWordsRatings = getUniqueWordsRating(reviewsAndBlurbs)
     displayScores(uniqueWordsRatings)
 
 main()
