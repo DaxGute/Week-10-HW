@@ -1,10 +1,21 @@
 # TODO REIMPORT FILES AND DOUBLE CHECK STANDARDS AND COMMENTS
 import math
-"""
-Purpose: This code is passed in a file name and searches the immediate folder
-for that file. When this file is found, it parses in its data line by line.
-Each one of these lines are stored in an array for later use and passed out.
-"""
+
+def binarySearch(x, L):
+    low = 0
+    high = len(L) - 1
+    while True:
+        mid = (high + low)//2
+        listItem = L[mid]
+        if x == listItem:
+            return mid
+        elif x > listItem:
+            low = mid + 1
+        elif x < listItem:
+            high = mid - 1
+        if low > high:
+            return -1
+
 def getIndividualLinesAsList(file):
     f = open(file, "r")
     listOfLines = []
@@ -12,27 +23,22 @@ def getIndividualLinesAsList(file):
         listOfLines.append(x.lower().replace("\n","").replace("\t",""))
 
     return listOfLines
-
 """
-Purpose: This method eliminates all the words that are unlikely to provide clarity
-on whether or not a given film is good or bad based on the ratings. These words
-are stored in a file that is read in. If any of the words in a line match these
-banned words, they are removed. The words are kept as individual indexs on an
-array of blurbs and then returned.
+Purpose: This code is passed in a file name and searches the immediate folder
+for that file. When this file is found, it parses in its data line by line.
+Each one of these lines are stored in an array for later use and passed out.
 """
-def purgeUnecessaryCharacters(reviewBlurbs):
-    bannedWords = getIndividualLinesAsList("stopWords.txt")
-    additionalBannedWords = [",",".",":",";","a"]
-    newTrimmedReviews = []
-    for review in reviewBlurbs:
-        words = getWordsOfBlurb(review)
-        newBlurb = []
-        for word in words:
-            if word not in bannedWords and word not in additionalBannedWords:
-                newBlurb.append(word)
-        newTrimmedReviews.append(newBlurb)
+def proccessLinesAsListOfWords(file):
+    f = open(file, "r")
+    reviews = []
+    reviews.append([]) #ratings
+    reviews.append([]) #blurb
+    for line in f:
+        reviews[0].append(int(line[:1])-2)
+        proccessedLine = line.lower().replace("\n","").replace("\t","")
+        reviews[1].append(getWordsOfBlurb(proccessedLine))
 
-    return newTrimmedReviews
+    return reviews
 
 """
 Purpose: This method is passed in a blurb of the of a review. Using this blurb,
@@ -40,31 +46,17 @@ it then splits up the blurb into the words and puts those split up words into an
 array that is passed out.
 """
 def getWordsOfBlurb(blurbText):
+    bannedWords = getIndividualLinesAsList("stopWords.txt")
     words = []
     lastSpaceIndex = 0
     for i in range(len(blurbText)):
         if blurbText[i] == " ":
-            words.append(blurbText[lastSpaceIndex:i])
+            word = blurbText[lastSpaceIndex:i]
+            if binarySearch(word,bannedWords) == -1 and word.isalpha():
+                words.append(word)
             lastSpaceIndex = i + 1
 
     return words
-
-
-"""
-Purpose: This method separates the Blurbs and the Ratings from the list. The ratings
-are appropriately shifted and then both of them are returned as items of a lists.
-"""
-def separateRatingBlurbFromList(listOfReviews):
-    reviews = []
-    reviews.append([]) #ratings
-    reviews.append([]) #blurb
-    for review in listOfReviews:
-        reviews[0].append(int(review[:1])-2)
-        reviews[1].append(review[1:])
-
-    reviews[1] = purgeUnecessaryCharacters(reviews[1])
-
-    return reviews
 
 
 """
@@ -74,7 +66,7 @@ then outputs this list of scores as an unsorted list of words and their
 associated scores.
 """
 def getUniqueWordsRating(reviewsAndBlurbs): #[[number, number ...],[[word, word ...],[word, word ...]...]]
-    listOfUniqueWords = getUniqueWords(reviewsAndBlurbs[1])
+    listOfUniqueWords = wordBubbleSort(getUniqueWords(reviewsAndBlurbs[1]))
     parrellelWordSum = []
     parrellelWordNum = []
 
@@ -84,7 +76,7 @@ def getUniqueWordsRating(reviewsAndBlurbs): #[[number, number ...],[[word, word 
 
     for i in range(len(reviewsAndBlurbs[0])):
         for word in reviewsAndBlurbs[1][i]:
-            listIndex = listOfUniqueWords.index(word) #TODO: ask is this allowed
+            listIndex = binarySearch(word, listOfUniqueWords)
             parrellelWordSum[listIndex] += reviewsAndBlurbs[0][i]
             parrellelWordNum[listIndex] += 1
 
@@ -103,8 +95,15 @@ def getUniqueWords(reviews):
                 uniqueWords.append(word)
     return uniqueWords
 
+def wordBubbleSort(uniqueWords):
+    for i in range(len(uniqueWords)):
+        for j in range(len(uniqueWords)-1 - i):
+            if uniqueWords[j] > uniqueWords[j+1]:
+                uniqueWords[j], uniqueWords[j+1] = uniqueWords[j+1], uniqueWords[j]
 
-def uniqueWordBubbleSort(uniqueWords):
+    return uniqueWords
+
+def rankWordBubbleSort(uniqueWords):
     for i in range(len(uniqueWords[1])):
         for j in range(len(uniqueWords[1])-1 - i):
             if uniqueWords[1][j] > uniqueWords[1][j+1]:
@@ -117,9 +116,9 @@ that is associated with the word. Words with the highest values are sent to the 
 Words are then displayed by the top twenty and bottom twenty.
 """
 def displayScores(uniqueWordsRatings):
-    uniqueWordBubbleSort(uniqueWordsRatings)
+    rankWordBubbleSort(uniqueWordsRatings)
     print("Top 20")
-    for i in range(-20, 0):
+    for i in range(-1, -21, -1):
         print(f'{uniqueWordsRatings[1][i]:.2f} {uniqueWordsRatings[0][i]}')
     print("\nBottom 20")
     for i in range(21):
@@ -128,8 +127,7 @@ def displayScores(uniqueWordsRatings):
 
 #TODO: make sure to filter out all of the bad apostrophes and stuff
 def main():
-    listOfReviews = getIndividualLinesAsList("movieReviews.txt")
-    reviewsAndBlurbs = separateRatingBlurbFromList(listOfReviews)
+    reviewsAndBlurbs = proccessLinesAsListOfWords("movieReviews.txt")
     uniqueWordsRatings = getUniqueWordsRating(reviewsAndBlurbs)
     displayScores(uniqueWordsRatings)
 

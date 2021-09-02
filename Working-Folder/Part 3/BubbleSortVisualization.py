@@ -62,7 +62,7 @@ def updateRectanglesWithRandom(windowBars, L, win):
 
 
 def main():
-    N = 30
+    N = 50
     L = []
     lSorted = []
     windowBars = []
