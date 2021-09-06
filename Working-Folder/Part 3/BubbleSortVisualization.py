@@ -1,8 +1,24 @@
+"""
+Description: Your task is to write a program, visual-sort.py, that displays a visualization 
+of how one particular sorting algorithm works.  This visualization can work by printing strings
+to the terminal, or — for an extra challenge — by creating an animation using Zelle graphics. 
+Your program should allow its users to see how a particular sorting algorithm changes a list 
+from unsorted to sorted, one swap at a time.
+Name: Daxton Gutekunst
+Date: Sep. 5 2021
+"""
+
 from graphics import *
 from random import shuffle
 from time import *
 
 def bubbleSortCompareIndexes(windowBars, L, win, j):
+    """
+    Purpose: This function runs one comparison of bubble sort. This comparison is then sent to the 
+    displaySwitched function to be displayed.
+    Parameters: the window bars, parrellel list of values, the window, the current index being compared
+    Return Val: NA
+    """
     if L[j] > L[j+1]:
         L[j], L[j+1] = L[j+1], L[j]
 
@@ -10,6 +26,11 @@ def bubbleSortCompareIndexes(windowBars, L, win, j):
 
 
 def displaySwitched(i, j, windowBars, L, win):
+    """
+    Purpose: Switches the rectangles and displays that switch on the window 
+    Parameters: first index, second index, list of rectangles, parrellel list, window
+    Return Val: NA
+    """
     windowBars[i][1].setFill('blue')
     windowBars[j][1].setFill('blue')
     windowBars[i][1].undraw()
@@ -33,15 +54,39 @@ def displaySwitched(i, j, windowBars, L, win):
     windowBars[j][1].draw(win)
 
 
-def bubbleSort(windowBars, L, lSorted, win):
+def bubbleSort(windowBars, L, win):
+    """
+    Purpose: This is a modified version of bubble sort. Each comparison is sent to another method to 
+    be compared and displayed. When it is sorted, is is stopped and the program is over.
+    Parameters: the window bars, a parrellel list of values, the window 
+    Return Val: NA
+    """
     for i in range(len(L)):
         for j in range(len(L)-1-i):
             bubbleSortCompareIndexes(windowBars, L, win, j)
-        if L == lSorted:
+        if isSorted(L):
             break
 
 
+def isSorted(L):
+    """
+    Purpose: Checks if a list is sorted from lowest to highest 
+    Parameters: a list 
+    Return Val: a boolean based on if the list is sorted or not 
+    """
+    for i in range(len(L)-1):
+        if L[i]>L[i+1]:
+            return False
+    return True
+
+
 def updateRectanglesWithRandom(windowBars, L, win):
+    """
+    Purpose: Randomly shuffles and display rectangles on the window. After it shuffles and recalculates
+    the rectangle positions, a list of new rectangles is returned.
+    Parameters: list of rectangles, the parrellel list, window
+    Return Val: a new list of rectangles
+    """
     shuffle(L)
     for item in win.items[:]:
         item.undraw()
@@ -61,31 +106,42 @@ def updateRectanglesWithRandom(windowBars, L, win):
     return newBars
 
 
-def main():
-    N = 50
+def setUpRectangles(N):
+    """
+    Purpose: Sets up the initial set of rectangles and parrellel list
+    Parameters: number of rectangles
+    Return Val: the list of rectangles, the parrellel list
+    """
     L = []
     lSorted = []
     windowBars = []
     for i in range(N):
-        L.append(i) # in case I want to make it with different values in the future
+        L.append(i) 
         lSorted.append(i)
         barBottomX = 2 + (i*11)
         barTopX = 9 + (i*11)
-        tuple = (i, Rectangle(Point(barBottomX,0), Point(barTopX,i*10)))
-        windowBars.append(tuple)
+        rect = (i, Rectangle(Point(barBottomX,0), Point(barTopX,i*10)))
+        rect[1].setFill('red')
+        windowBars.append(rect)
+    
+    return windowBars, L
 
-    win = GraphWin("Bubble Sort", N*11, N*10)
-    win.setCoords(0, 0, N*11, N*10)
+
+def main():
+    numRect = int(input("How large is the list: "))
+    windowBars, L = setUpRectangles(numRect)
+
+    win = GraphWin("Bubble Sort", numRect*11, numRect*10)
+    win.setCoords(0, 0, numRect*11, numRect*10)
 
     for rect in windowBars:
-        rect[1].setFill('red')
         rect[1].draw(win)
 
     windowBars = updateRectanglesWithRandom(windowBars, L, win)
 
-    bubbleSort(windowBars, L, lSorted, win)
+    bubbleSort(windowBars, L, win)
 
-    win.getMouse() # pause for click in window
+    win.getMouse()
 
     win.close()
 main()

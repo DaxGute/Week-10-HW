@@ -1,4 +1,4 @@
-a's
+a
 able
 about
 above
@@ -201,7 +201,7 @@ hopefully
 how
 howbeit
 however
-I
+i
 i'd
 i'll
 i'm
@@ -235,8 +235,8 @@ keep
 keeps
 kept
 know
-knows
 known
+knows
 last
 lately
 later
