@@ -100,22 +100,22 @@ def getUniqueWordsRating(reviews):
     Return Val: A parrellel list of unique words and their ratings
     """
     listOfUniqueWords = getUniqueWords(reviews[1])
-    sortedUniqueWords = wordSelectionSort(listOfUniqueWords)
+    wordSelectionSort(listOfUniqueWords)
     parrellelWordSum = []
     parrellelWordNum = []
 
-    for i in range(len(sortedUniqueWords)):
+    for i in range(len(listOfUniqueWords)):
         parrellelWordSum.append(0)
         parrellelWordNum.append(0)
 
     for i in range(len(reviews[0])):
         for word in reviews[1][i]:
-            listIndex = binarySearch(word, sortedUniqueWords)
+            listIndex = binarySearch(word, listOfUniqueWords)
             parrellelWordSum[listIndex] += reviews[0][i]
             parrellelWordNum[listIndex] += 1
 
-    wordRatings = [sortedUniqueWords,[]]
-    for i in range(len(sortedUniqueWords)):
+    wordRatings = [listOfUniqueWords,[]]
+    for i in range(len(listOfUniqueWords)):
         wordRatings[1].append((parrellelWordSum[i]/parrellelWordNum[i])*math.log(parrellelWordNum[i]))
 
     return wordRatings
