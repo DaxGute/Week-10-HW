@@ -190,7 +190,7 @@ def displayScores(uniqueWordsRatings):
 
 
 def main():
-    reviews = proccessLinesAsListOfWords("movieReviews.txt")
+    reviews = proccessLinesAsListOfWords("MovieReviews.txt")
     uniqueWordsRatings = getUniqueWordsRating(reviews)
     displayScores(uniqueWordsRatings)
 
